@@ -466,9 +466,15 @@ $("#printBtn").onclick=()=>{$("#printDate").textContent="Starting "+fmtLong(week
 $("#emailBtn").onclick=()=>{
   const v=$("#email").value.trim(),note=$("#captureNote");
   if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(v)){note.textContent="Enter a valid email and we'll send your forecast over.";return;}
-  // DEMO STUB: wire to Mailchimp / Zapier to capture the lead + email the PDF.
-  note.textContent="\u2713 Thanks \u2014 your forecast is on its way to "+v+". (Demo: connect this to Mailchimp/Zapier to go live.)";
-  $("#email").value="";
+  // Send to Zapier webhook
+  fetch('https://hooks.zapier.com/hooks/catch/27934007/43rr13e/', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({email: v})
+  }).then(r=>{
+    if(r.ok){note.textContent="✓ Thanks — your forecast is on its way to "+v+".";$("#email").value="";}
+    else{note.textContent="Something went wrong. Try again?";}
+  }).catch(e=>{note.textContent="Connection error. Try again?"});
 };
 function syncGlobals(){$("#startDate").value=state.startDate;$("#startCash").value=state.startCash;$("#overhead").value=state.overhead;$("#buffer").value=state.buffer;$("#weeks").value=state.weeks;}
 
