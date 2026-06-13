@@ -1,0 +1,27 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import ToolCard from '../../../components/ToolCard.astro';
+import { tools } from '../../../data/tools';
+---
+<BaseLayout
+  title="Free contractor tools — OmniSolutions"
+  description="Free, no-signup tools that solve real problems for contractors: cash flow, change orders, and more."
+>
+  <section class="os-wrap hero">
+    <p class="os-eyebrow">Free tools · no signup to use</p>
+    <h1 class="os-h1">Tools for contractors</h1>
+    <p class="os-lead">Each one solves a problem owners usually pay a consultant to handle. Use them free — the answers are yours to keep.</p>
+  </section>
+
+  <section class="os-wrap grid-sec">
+    <div class="tool-grid">
+      {tools.map((tool) => <ToolCard tool={tool} />)}
+    </div>
+  </section>
+
+  <style>
+    .hero { padding: 64px 22px 28px; }
+    .grid-sec { padding: 8px 22px 12px; }
+    .tool-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
+  </style>
+</BaseLayout>

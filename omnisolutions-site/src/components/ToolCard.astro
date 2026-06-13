@@ -1,0 +1,31 @@
+---
+import { withBase } from '../lib/url';
+import type { Tool } from '../data/tools';
+interface Props { tool: Tool; }
+const { tool } = Astro.props;
+const live = tool.status === 'live';
+const href = withBase(`/contractor/tools/${tool.slug}`);
+---
+<a class:list={["tool-card", { disabled: !live }]} href={live ? href : undefined}>
+  <div class="tc-top">
+    <span class="tc-tag">{tool.audience}</span>
+    {!live && <span class="tc-soon">Coming soon</span>}
+  </div>
+  <h3 class="tc-title">{tool.title}</h3>
+  <p class="tc-tagline">{tool.tagline}</p>
+  <p class="tc-desc">{tool.description}</p>
+  {live && <span class="tc-cta">Open tool →</span>}
+
+  <style>
+    .tool-card { display: block; text-decoration: none; color: inherit; background: var(--os-card); border: 1px solid var(--os-line); border-radius: var(--os-radius); padding: 22px 24px; box-shadow: var(--os-shadow); transition: transform .14s, box-shadow .14s; }
+    .tool-card:hover:not(.disabled) { transform: translateY(-3px); box-shadow: 0 4px 8px rgba(24,34,43,.07), 0 18px 44px rgba(24,34,43,.1); }
+    .tool-card.disabled { opacity: .65; cursor: default; }
+    .tc-top { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
+    .tc-tag { font-family: var(--os-mono); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--os-blue); background: var(--os-blue-tint); border-radius: 5px; padding: 3px 8px; font-weight: 600; }
+    .tc-soon { font-family: var(--os-mono); font-size: 11px; color: var(--os-steel-light); }
+    .tc-title { font-family: var(--os-display); font-weight: 700; font-size: 20px; margin: 0 0 6px; letter-spacing: -.01em; }
+    .tc-tagline { font-weight: 500; margin: 0 0 10px; color: var(--os-ink); }
+    .tc-desc { color: var(--os-steel); font-size: 14.5px; margin: 0 0 16px; }
+    .tc-cta { font-family: var(--os-display); font-weight: 600; color: var(--os-blue); font-size: 15px; }
+  </style>
+</a>

@@ -1,0 +1,64 @@
+---
+import '../styles/tokens.css';
+import { withBase } from '../lib/url';
+
+interface Props {
+  title: string;
+  description?: string;
+}
+const { title, description = '' } = Astro.props;
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <nav class="toolbar-crumb">
+      <div class="crumb-inner">
+        <a href={withBase('/')} class="brand">OmniSolutions</a>
+        <span class="sep">/</span>
+        <a href={withBase('/contractor/tools')}>Contractor tools</a>
+      </div>
+    </nav>
+    <slot />
+    <footer class="tool-foot">
+      <div class="crumb-inner">
+        Built by <strong>OmniSolutions</strong> — business systems for owner-led companies.
+      </div>
+    </footer>
+
+    <style is:global>
+      body { margin: 0; }
+      .toolbar-crumb {
+        background: var(--os-blue); color: #fff;
+        font-family: var(--os-body); font-size: 13px;
+      }
+      .toolbar-crumb .crumb-inner {
+        max-width: 1000px; margin: 0 auto; padding: 11px 18px;
+        display: flex; align-items: center; gap: 9px;
+      }
+      .toolbar-crumb a { color: #cfe0f0; text-decoration: none; }
+      .toolbar-crumb a:hover { color: #fff; }
+      .toolbar-crumb a.brand { color: #fff; font-weight: 700; font-family: var(--os-display); }
+      .toolbar-crumb .sep { color: #6f93b6; }
+      .tool-foot {
+        font-family: var(--os-body); font-size: 13px; color: var(--os-steel-light);
+        border-top: 1px solid var(--os-line); background: #fff;
+      }
+      .tool-foot .crumb-inner { max-width: 1000px; margin: 0 auto; padding: 18px; text-align: center; }
+      .tool-foot strong { color: var(--os-steel); }
+      @media print { .toolbar-crumb, .tool-foot { display: none; } }
+    </style>
+  </body>
+</html>

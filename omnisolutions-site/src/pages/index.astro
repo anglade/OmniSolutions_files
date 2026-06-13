@@ -1,0 +1,62 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { withBase } from '../lib/url';
+import { liveTools } from '../data/tools';
+const count = liveTools().length;
+---
+<BaseLayout title="OmniSolutions — Business systems for owner-led companies">
+  <section class="os-wrap hero">
+    <p class="os-eyebrow">Business systems consulting</p>
+    <h1 class="os-h1">Most business problems aren't people problems.<br />They're system problems.</h1>
+    <p class="os-lead">OmniSolutions helps owner-led companies reclaim time, clarity, and peace by fixing the systems underneath the work — not by adding more to do.</p>
+    <div class="hero-actions">
+      <a class="os-btn" href={withBase('/contractor/tools')}>Try the free tools</a>
+      <a class="os-btn ghost" href={withBase('/contractor')}>For contractors</a>
+    </div>
+  </section>
+
+  <section class="os-wrap belief">
+    <div class="belief-grid">
+      <div>
+        <h2 class="os-h2">The gap is where the work lives.</h2>
+        <p>AI and software can hand you information. They can't install a system, get your team to buy in, or hold the new way in place. That last mile — the execution gap — is where things actually change. That's the work.</p>
+      </div>
+      <div class="belief-points">
+        <div class="bp"><span>01</span><p>We find the bottleneck you can't see because you're too close to it.</p></div>
+        <div class="bp"><span>02</span><p>We redesign the system around it — process first, automation where it helps.</p></div>
+        <div class="bp"><span>03</span><p>We sequence quick wins first, so momentum builds before the big fix lands.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="os-wrap tools-cta">
+    <div class="tools-cta-card">
+      <div>
+        <p class="os-eyebrow">Free tools</p>
+        <h2 class="os-h2">Start with something useful.</h2>
+        <p class="os-lead" style="margin-bottom:0">We build free tools that solve real problems owners usually pay to handle. No signup to use them. {count > 0 && `${count} live right now.`}</p>
+      </div>
+      <a class="os-btn" href={withBase('/contractor/tools')}>Browse the tools</a>
+    </div>
+  </section>
+
+  <style>
+    .hero { padding: 72px 22px 40px; }
+    .hero-actions { display: flex; gap: 12px; flex-wrap: wrap; }
+    .belief { padding: 40px 22px; }
+    .belief-grid { display: grid; grid-template-columns: 1.1fr 1fr; gap: 48px; align-items: start; }
+    .belief p { color: var(--os-steel); font-size: 16px; }
+    .belief-points { display: flex; flex-direction: column; gap: 18px; }
+    .bp { display: flex; gap: 14px; align-items: flex-start; }
+    .bp span { font-family: var(--os-mono); font-weight: 600; color: var(--os-blue); font-size: 14px; padding-top: 2px; }
+    .bp p { margin: 0; }
+    .tools-cta { padding: 24px 22px 12px; }
+    .tools-cta-card { background: var(--os-blue); color: #fff; border-radius: 18px; padding: 36px 38px; display: flex; align-items: center; justify-content: space-between; gap: 28px; flex-wrap: wrap; }
+    .tools-cta-card .os-eyebrow { color: #9DC0E0; }
+    .tools-cta-card .os-h2 { color: #fff; }
+    .tools-cta-card .os-lead { color: #D5E2EF; }
+    .tools-cta-card .os-btn { background: #fff; color: var(--os-blue); border-color: #fff; }
+    .tools-cta-card .os-btn:hover { background: var(--os-blue-tint); }
+    @media (max-width: 760px) { .belief-grid { grid-template-columns: 1fr; gap: 28px; } }
+  </style>
+</BaseLayout>

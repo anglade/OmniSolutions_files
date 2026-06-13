@@ -1,0 +1,482 @@
+---
+import ToolLayout from '../../../layouts/ToolLayout.astro';
+---
+<ToolLayout
+  title="Cash Flow Forecaster — OmniSolutions"
+  description="See which weeks your construction business runs tight or out of cash, before they happen. Free, no signup."
+>
+  <style is:global>
+:root{
+    --paper:#EAEEF1;--card:#FFFFFF;--ink:#18222B;--steel:#5B6B79;--steel-light:#8795A0;
+    --line:#D5DCE2;--blue:#1F4E79;--blue-dark:#163A5C;--blue-tint:#E8EFF6;
+    --good:#2E7D58;--good-tint:#E4F1EA;--tight:#E0962D;--tight-tint:#FBF0DC;
+    --danger:#CE4B22;--danger-tint:#FBE7DE;
+    --shadow:0 1px 2px rgba(24,34,43,.06),0 6px 20px rgba(24,34,43,.06);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{background:var(--paper);color:var(--ink);font-family:"IBM Plex Sans",system-ui,sans-serif;
+    line-height:1.5;-webkit-font-smoothing:antialiased;padding:28px 18px 60px;}
+  .wrap{max-width:1000px;margin:0 auto}
+  .mono{font-family:"IBM Plex Mono",monospace;font-variant-numeric:tabular-nums}
+
+  header{margin-bottom:22px}
+  .eyebrow{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.18em;
+    text-transform:uppercase;color:var(--blue);font-weight:600;margin:0 0 8px;}
+  h1{font-family:"Archivo",sans-serif;font-weight:800;font-size:clamp(27px,4.4vw,42px);
+    line-height:1.04;letter-spacing:-.015em;margin:0 0 8px;}
+  .sub{color:var(--steel);max-width:60ch;margin:0;font-size:15px}
+
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;
+    box-shadow:var(--shadow);padding:20px 22px;margin-top:18px;}
+  .card-head{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin:0 0 16px;}
+  .card-head h2{font-family:"Archivo",sans-serif;font-weight:700;font-size:17px;margin:0;letter-spacing:-.01em;}
+  .card-head .step{font-family:"IBM Plex Mono",monospace;font-size:11px;font-weight:600;color:#fff;
+    background:var(--blue);border-radius:5px;padding:3px 7px;letter-spacing:.05em;}
+  .card-head .hint{color:var(--steel-light);font-size:13px;margin-left:auto;max-width:46ch;text-align:right}
+
+  .globals{display:flex;gap:16px;flex-wrap:wrap;align-items:flex-end}
+  .field{display:flex;flex-direction:column;gap:5px}
+  .field label{font-size:12px;font-weight:600;color:var(--steel);letter-spacing:.01em}
+  .field .sublabel{font-size:11px;color:var(--steel-light);font-weight:400}
+  input{font-family:"IBM Plex Sans",sans-serif;font-size:15px;border:1px solid var(--line);
+    border-radius:8px;background:#fff;padding:9px 11px;color:var(--ink);width:100%;}
+  .mono-in{font-family:"IBM Plex Mono",monospace}
+  input[type=date]{font-family:"IBM Plex Sans",sans-serif}
+  input.jobname{font-weight:600}
+  .money-wrap{position:relative}
+  .money-wrap span{position:absolute;left:11px;top:9px;color:var(--steel-light);
+    font-family:"IBM Plex Mono",monospace;font-size:15px}
+  .money-wrap input{padding-left:24px}
+  input:focus{outline:2px solid var(--blue);outline-offset:1px;border-color:var(--blue)}
+  .w-date{width:160px}.w-cash{width:140px}.w-over{width:150px}.w-buf{width:130px}.w-weeks{width:110px}
+
+  .tip{background:var(--blue-tint);border:1px solid #CADCEC;border-radius:9px;padding:10px 14px;
+    font-size:13px;color:var(--blue-dark);margin-bottom:16px;display:flex;gap:8px;align-items:flex-start}
+  .tip b{font-weight:600}
+
+  .job{border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:14px;background:#FCFDFE}
+  .job-top{display:flex;gap:12px;align-items:center}
+  .job-top .jobname{flex:1}
+  .jobsum{font-size:12px;color:var(--steel);margin:6px 2px 14px;font-family:"IBM Plex Mono",monospace}
+  .jobsum b{color:var(--ink);font-weight:600}
+  .jobsum .neg{color:var(--danger)}
+
+  details.quick{border:1px solid var(--line);border-radius:9px;margin-bottom:14px;background:#fff;overflow:hidden}
+  details.quick>summary{cursor:pointer;list-style:none;padding:10px 14px;font-size:13px;font-weight:600;
+    color:var(--blue);display:flex;align-items:center;gap:8px;user-select:none}
+  details.quick>summary::-webkit-details-marker{display:none}
+  details.quick>summary::before{content:"\25B8";font-size:11px;transition:.15s}
+  details.quick[open]>summary::before{transform:rotate(90deg)}
+  .quick-body{padding:4px 14px 14px;border-top:1px solid var(--line)}
+  .quick-grid{display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end;margin-bottom:12px}
+  .quick-grid .field label{font-size:11px}
+  .qw-c{width:130px}.qw-s{width:78px}.qw-p{width:78px}
+  .quick-note{font-size:12px;color:var(--steel-light);margin:0 0 12px}
+
+  .ledgers{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  @media(max-width:680px){.ledgers{grid-template-columns:1fr}.card-head .hint{text-align:left;margin-left:0}}
+  .ledger h4{font-family:"Archivo",sans-serif;font-size:12px;font-weight:700;text-transform:uppercase;
+    letter-spacing:.08em;margin:0 0 9px;display:flex;align-items:center;gap:7px;}
+  .ledger h4 .dot{width:8px;height:8px;border-radius:50%}
+  .ledger.in h4{color:var(--good)}.ledger.in .dot{background:var(--good)}
+  .ledger.out h4{color:var(--danger)}.ledger.out .dot{background:var(--danger)}
+  .wk-head{display:grid;grid-template-columns:1fr 54px 92px 26px;gap:7px;font-size:10.5px;
+    text-transform:uppercase;letter-spacing:.05em;color:var(--steel-light);font-weight:600;margin-bottom:6px;padding:0 2px}
+  .wk-head span:nth-child(2),.wk-head span:nth-child(3){text-align:center}
+  .line{display:grid;grid-template-columns:1fr 54px 92px 26px;gap:7px;margin-bottom:7px;align-items:center}
+  .line input{padding:7px 8px;font-size:13px}
+  .line .wk{text-align:center}
+  .line .wkdate{font-size:9.5px;color:var(--steel-light);text-align:center;font-family:"IBM Plex Mono";margin-top:1px}
+  .x{border:none;background:none;color:var(--steel-light);cursor:pointer;font-size:18px;line-height:1;border-radius:6px;padding:2px}
+  .x:hover{color:var(--danger);background:var(--danger-tint)}
+  .addline{border:1px dashed var(--line);background:none;border-radius:7px;color:var(--steel);
+    font-size:12px;font-weight:600;font-family:inherit;padding:6px 10px;cursor:pointer;margin-top:3px;width:100%;}
+  .addline:hover{border-color:var(--blue);color:var(--blue)}
+  .job-actions{display:flex;justify-content:flex-end;margin-top:12px}
+  .removejob{border:none;background:none;color:var(--steel-light);font-size:12px;font-weight:600;cursor:pointer;font-family:inherit}
+  .removejob:hover{color:var(--danger)}
+
+  .toolbar{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+  button.btn{font-family:"Archivo",sans-serif;font-weight:600;font-size:14px;border-radius:9px;
+    padding:11px 18px;cursor:pointer;border:1px solid var(--blue);background:var(--blue);color:#fff;transition:.12s;}
+  button.btn:hover{background:var(--blue-dark);border-color:var(--blue-dark)}
+  button.btn.ghost{background:#fff;color:var(--blue)}
+  button.btn.ghost:hover{background:var(--blue-tint)}
+  button.btn.subtle{background:#fff;color:var(--steel);border-color:var(--line)}
+  button.btn.subtle:hover{border-color:var(--steel);color:var(--ink)}
+  button.gen{font-family:"Archivo",sans-serif;font-weight:600;font-size:13px;border-radius:8px;
+    padding:9px 15px;cursor:pointer;border:1px solid var(--blue);background:var(--blue);color:#fff}
+  button.gen:hover{background:var(--blue-dark)}
+
+  .verdict{font-family:"Archivo",sans-serif;font-weight:700;font-size:18px;margin:0 0 4px;letter-spacing:-.01em}
+  .verdict .pill{font-size:12px;font-family:"IBM Plex Mono",monospace;padding:3px 8px;border-radius:6px;
+    vertical-align:middle;margin-right:8px;font-weight:600}
+  .pill.ok{background:var(--good-tint);color:var(--good)}
+  .pill.warn{background:var(--tight-tint);color:var(--tight)}
+  .pill.bad{background:var(--danger-tint);color:var(--danger)}
+  .verdict-sub{color:var(--steel);font-size:14px;margin:0 0 18px;max-width:70ch}
+
+  .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:22px}
+  @media(max-width:680px){.stats{grid-template-columns:repeat(2,1fr)}}
+  .stat{border:1px solid var(--line);border-radius:10px;padding:12px 14px;background:#FCFDFE}
+  .stat .k{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--steel-light);font-weight:600;margin-bottom:5px}
+  .stat .v{font-family:"IBM Plex Mono",monospace;font-size:19px;font-weight:600;letter-spacing:-.01em}
+  .stat .v small{font-size:12px;color:var(--steel);font-weight:500}
+  .stat.lowpt .v{color:var(--blue)}
+
+  .chart-frame{border:1px solid var(--line);border-radius:10px;padding:14px 10px 6px;background:#FCFDFE;overflow-x:auto}
+  svg{display:block;width:100%;min-width:520px}
+  .legend{display:flex;gap:18px;flex-wrap:wrap;font-size:12px;color:var(--steel);margin-top:8px;padding:0 6px 4px}
+  .legend i{display:inline-block;width:11px;height:11px;border-radius:2px;margin-right:5px;vertical-align:-1px}
+
+  .danger-list{margin-top:18px;border-top:1px solid var(--line);padding-top:16px}
+  .danger-list h3{font-family:"Archivo",sans-serif;font-size:14px;margin:0 0 10px;font-weight:700}
+  .crunch{display:flex;justify-content:space-between;align-items:center;padding:9px 12px;border-radius:8px;margin-bottom:7px;font-size:14px}
+  .crunch.bad{background:var(--danger-tint)}
+  .crunch.warn{background:var(--tight-tint)}
+  .crunch .lbl{font-weight:600}
+  .crunch .amt{font-family:"IBM Plex Mono",monospace;font-weight:600}
+  .crunch.bad .amt{color:var(--danger)}.crunch.warn .amt{color:var(--tight)}
+  .all-clear{color:var(--good);font-size:14px;font-weight:600;background:var(--good-tint);padding:11px 14px;border-radius:8px}
+
+  .insight{background:var(--blue);color:#fff;border-radius:14px;padding:24px 26px;margin-top:18px}
+  .insight .eyebrow{color:#9DC0E0}
+  .insight h2{font-family:"Archivo",sans-serif;font-weight:700;font-size:20px;margin:0 0 8px;letter-spacing:-.01em;color:#fff}
+  .insight p{color:#D5E2EF;margin:0 0 18px;max-width:62ch;font-size:14.5px}
+  .capture{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+  .capture input{max-width:300px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.3);color:#fff}
+  .capture input::placeholder{color:#A9C4DC}
+  .capture button{background:#fff;color:var(--blue);border:none;font-family:"Archivo",sans-serif;font-weight:700;
+    border-radius:9px;padding:11px 18px;cursor:pointer;font-size:14px}
+  .capture button:hover{background:var(--blue-tint)}
+  .capture .note{font-size:12px;color:#9DC0E0;width:100%;margin-top:4px}
+  .signoff{text-align:center;color:var(--steel-light);font-size:12px;margin-top:24px}
+  .signoff strong{color:var(--steel);font-weight:600}
+
+  .print-head{display:none}
+  @media print{
+    body{background:#fff;padding:0}
+    .globals-card,.jobs-card,.toolbar,.insight{display:none}
+    .print-head{display:block;margin-bottom:8px}
+    .print-head h1{font-size:24px;margin:0 0 2px}
+    .print-head p{color:#555;font-size:13px;margin:0}
+    .card{box-shadow:none;border-color:#ccc}
+  }
+  </style>
+
+<div class="wrap">
+  <div class="print-head"><h1>Cash Flow Forecast</h1><p id="printDate"></p></div>
+
+  <header>
+    <p class="eyebrow">Free tool · for contractors</p>
+    <h1>Will you run out of cash before the next payment lands?</h1>
+    <p class="sub">Map your jobs, your draws, and your costs. See your bank balance week by week — and exactly which weeks go tight before they catch you off guard.</p>
+  </header>
+
+  <div class="card globals-card">
+    <div class="card-head"><span class="step">01</span><h2>Set your starting point</h2></div>
+    <div class="globals">
+      <div class="field">
+        <label for="startDate">Project start date</label>
+        <span class="sublabel">Week 0 begins here</span>
+        <input id="startDate" type="date" class="w-date">
+      </div>
+      <div class="field">
+        <label for="startCash">Cash in the bank today</label>
+        <span class="sublabel">Your real balance now</span>
+        <div class="money-wrap w-cash"><span>$</span><input id="startCash" class="mono-in" inputmode="numeric" value="35000"></div>
+      </div>
+      <div class="field">
+        <label for="overhead">Weekly overhead</label>
+        <span class="sublabel">Rent, insurance, your pay, trucks</span>
+        <div class="money-wrap w-over"><span>$</span><input id="overhead" class="mono-in" inputmode="numeric" value="2000"></div>
+      </div>
+      <div class="field">
+        <label for="buffer">Minimum cash buffer</label>
+        <span class="sublabel">Cushion you won't dip below</span>
+        <div class="money-wrap w-buf"><span>$</span><input id="buffer" class="mono-in" inputmode="numeric" value="5000"></div>
+      </div>
+      <div class="field">
+        <label for="weeks">Weeks to look ahead</label>
+        <span class="sublabel">&nbsp;</span>
+        <input id="weeks" class="mono-in w-weeks" inputmode="numeric" value="16">
+      </div>
+    </div>
+  </div>
+
+  <div class="card jobs-card">
+    <div class="card-head"><span class="step">02</span><h2>Your jobs</h2>
+      <span class="hint">Money in = deposits, draws, final payments. Money out = labor, materials, subs.</span>
+    </div>
+    <div class="tip">
+      <span>&#128161;</span>
+      <span><b>New here?</b> This is loaded with a sample contractor's jobs so you can see how it works. Change the numbers, or hit <b>Clear all</b> and add your own. Each job has a <b>Quick setup</b> that builds the schedule for you from a few basics.</span>
+    </div>
+    <div id="jobs"></div>
+    <div class="toolbar">
+      <button class="btn ghost" id="addJob">+ Add a job</button>
+      <button class="btn subtle" id="loadExample">Load example</button>
+      <button class="btn subtle" id="clearAll">Clear all</button>
+    </div>
+  </div>
+
+  <div class="card" id="results">
+    <div class="card-head"><span class="step">03</span><h2>Your cash position</h2></div>
+    <div id="verdict"></div>
+    <div class="stats" id="stats"></div>
+    <div class="chart-frame"><div id="chart"></div></div>
+    <div class="legend">
+      <span><i style="background:var(--good)"></i>Healthy (above buffer)</span>
+      <span><i style="background:var(--tight)"></i>Tight (below buffer)</span>
+      <span><i style="background:var(--danger)"></i>Negative (out of cash)</span>
+    </div>
+    <div class="danger-list" id="dangerList"></div>
+  </div>
+
+  <div class="insight">
+    <p class="eyebrow">What the dip is really telling you</p>
+    <h2>A recurring cash crunch is almost never a money problem.</h2>
+    <p>When the same gap shows up every few weeks, it usually isn't that the jobs aren't profitable — it's that the work gets done before the billing catches up. The money you're owed is real; it's just arriving late and out of sequence. That's a billing-<em>system</em> problem, and it's fixable.</p>
+    <div class="capture">
+      <input id="email" type="email" placeholder="your@email.com" aria-label="Email">
+      <button id="emailBtn">Email me this forecast</button>
+      <button id="printBtn" style="background:rgba(255,255,255,.12);color:#fff">Print / save as PDF</button>
+      <span class="note" id="captureNote">Get a copy of this forecast plus a short checklist for tightening the gap between work done and money in.</span>
+    </div>
+  </div>
+
+  <p class="signoff">Built by <strong>OmniSolutions</strong> — business systems for owner-led companies.</p>
+</div>
+
+  <script is:inline>
+const STORE_KEY="omnisolutions:cashflow:v2";
+let state=null;
+const $=s=>document.querySelector(s);
+const uid=()=>Math.random().toString(36).slice(2,9);
+const num=v=>{const n=parseFloat(String(v).replace(/[^0-9.\-]/g,""));return isNaN(n)?0:n;};
+const fmt=n=>{const neg=n<0;const s="$"+Math.abs(Math.round(n)).toLocaleString();return neg?"\u2212"+s:s;};
+const MON=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+
+function nextMonday(){const d=new Date();const day=d.getDay();const add=(day===1)?0:((8-day)%7||7);d.setDate(d.getDate()+add);return d.toISOString().slice(0,10);}
+function parseDate(s){const d=new Date((s||"")+"T00:00:00");return isNaN(d)?new Date():d;}
+function weekDate(w){const d=parseDate(state.startDate);d.setDate(d.getDate()+w*7);return d;}
+function fmtMD(d){return (d.getMonth()+1)+"/"+d.getDate();}
+function fmtLong(d){return MON[d.getMonth()]+" "+d.getDate();}
+
+function exampleState(){
+  return {startDate:nextMonday(),startCash:35000,overhead:2000,buffer:5000,weeks:16,
+    jobs:[
+      {id:uid(),name:"Riverside Kitchen Remodel",_qopen:false,
+        q:{contract:80000,cost:56000,deposit:20,start:0,dur:13},
+        in:[{id:uid(),desc:"Deposit",wk:0,amt:16000},{id:uid(),desc:"Progress draw",wk:6,amt:24000},{id:uid(),desc:"Progress draw",wk:10,amt:24000},{id:uid(),desc:"Final + retention",wk:13,amt:16000}],
+        out:[{id:uid(),desc:"Materials",wk:1,amt:18000},{id:uid(),desc:"Labor",wk:2,amt:9000},{id:uid(),desc:"Labor",wk:4,amt:9000},{id:uid(),desc:"Labor",wk:6,amt:9000},{id:uid(),desc:"Subs",wk:8,amt:11000}]},
+      {id:uid(),name:"Maple Ave Bathroom",_qopen:false,
+        q:{contract:30000,cost:21000,deposit:20,start:2,dur:7},
+        in:[{id:uid(),desc:"Deposit",wk:2,amt:6000},{id:uid(),desc:"Final",wk:9,amt:24000}],
+        out:[{id:uid(),desc:"Materials",wk:2,amt:8000},{id:uid(),desc:"Labor",wk:3,amt:7000},{id:uid(),desc:"Labor",wk:5,amt:6000}]}
+    ]};
+}
+function emptyState(){return {startDate:nextMonday(),startCash:0,overhead:0,buffer:5000,weeks:16,jobs:[blankJob()]};}
+function blankJob(){return {id:uid(),name:"",_qopen:true,
+  q:{contract:"",cost:"",deposit:25,start:0,dur:8},
+  in:[{id:uid(),desc:"Deposit",wk:0,amt:0}],out:[{id:uid(),desc:"Materials",wk:0,amt:0}]};}
+
+function quickGen(job){
+  const q=job.q;const cv=num(q.contract),cost=num(q.cost);
+  let dep=num(q.deposit)/100;if(!dep||dep<=0)dep=.25;
+  const sw=Math.max(0,Math.round(num(q.start)));const dur=Math.max(1,Math.round(num(q.dur)));
+  const deposit=Math.round(cv*dep),final=Math.round(cv*0.25),progress=cv-deposit-final;
+  const ins=[{id:uid(),desc:"Deposit",wk:sw,amt:deposit}];
+  if(progress>0)ins.push({id:uid(),desc:"Progress draw",wk:sw+Math.max(1,Math.round(dur*0.55)),amt:progress});
+  ins.push({id:uid(),desc:"Final + retention",wk:sw+dur,amt:final});
+  const mat=Math.round(cost*0.35),rest=cost-mat,per=Math.round(rest/3);
+  const outs=[{id:uid(),desc:"Materials",wk:sw,amt:mat},
+    {id:uid(),desc:"Labor / subs",wk:sw+Math.max(1,Math.round(dur*0.3)),amt:per},
+    {id:uid(),desc:"Labor / subs",wk:sw+Math.max(2,Math.round(dur*0.6)),amt:per},
+    {id:uid(),desc:"Labor / subs",wk:sw+Math.max(3,Math.round(dur*0.85)),amt:rest-per*2}];
+  job.in=ins;job.out=outs;job._qopen=false;
+}
+
+function save(){try{localStorage.setItem(STORE_KEY,JSON.stringify(state));}catch(e){}}
+function load(){try{const v=localStorage.getItem(STORE_KEY);if(v)return JSON.parse(v);}catch(e){}return null;}
+
+function compute(){
+  const W=Math.max(1,Math.min(104,Math.round(num(state.weeks))));
+  const inflow=Array(W+1).fill(0),outflow=Array(W+1).fill(0);
+  let totalIn=0,totalOut=0;const oh=num(state.overhead);
+  state.jobs.forEach(j=>{
+    j.in.forEach(l=>{const w=Math.round(num(l.wk));if(w>=0&&w<=W){inflow[w]+=num(l.amt);totalIn+=num(l.amt);}});
+    j.out.forEach(l=>{const w=Math.round(num(l.wk));if(w>=0&&w<=W){outflow[w]+=num(l.amt);totalOut+=num(l.amt);}});
+  });
+  for(let w=0;w<=W;w++){outflow[w]+=oh;totalOut+=oh;}
+  const bal=[];let run=num(state.startCash);
+  for(let w=0;w<=W;w++){run+=inflow[w]-outflow[w];bal.push(run);}
+  let low=Infinity,lowW=0;bal.forEach((b,w)=>{if(b<low){low=b;lowW=w;}});
+  const buffer=num(state.buffer);const crunches=[];
+  bal.forEach((b,w)=>{if(b<buffer)crunches.push({w,b,level:b<0?"bad":"warn"});});
+  return {W,bal,low,lowW,totalIn,totalOut,buffer,crunches};
+}
+
+function renderJobs(){
+  const box=$("#jobs");box.innerHTML="";
+  state.jobs.forEach((j,ji)=>{
+    const tin=j.in.reduce((s,l)=>s+num(l.amt),0),tout=j.out.reduce((s,l)=>s+num(l.amt),0),net=tin-tout;
+    const margin=tin>0?Math.round(net/tin*100):0;
+    const el=document.createElement("div");el.className="job";
+    el.innerHTML=`
+      <div class="job-top"><input class="jobname" type="text" placeholder="Job name (e.g. Riverside Kitchen)" value="${esc(j.name)}" data-j="${ji}" data-f="name"></div>
+      <div class="jobsum">In <b>${fmt(tin)}</b> &middot; Out <b>${fmt(tout)}</b> &middot; Net <b class="${net<0?'neg':''}">${fmt(net)}</b>${tin>0?` &middot; ${margin}% margin`:""}</div>
+      <details class="quick" ${j._qopen?"open":""} data-jq="${ji}">
+        <summary>Quick setup &mdash; build the schedule from the basics</summary>
+        <div class="quick-body">
+          <div class="quick-grid">
+            <div class="field"><label>Contract value</label><div class="money-wrap qw-c"><span>$</span><input class="mono-in" inputmode="numeric" value="${j.q.contract}" data-j="${ji}" data-q="contract"></div></div>
+            <div class="field"><label>Your total cost</label><div class="money-wrap qw-c"><span>$</span><input class="mono-in" inputmode="numeric" value="${j.q.cost}" data-j="${ji}" data-q="cost"></div></div>
+            <div class="field"><label>Deposit %</label><input class="mono-in qw-p" inputmode="numeric" value="${j.q.deposit}" data-j="${ji}" data-q="deposit"></div>
+            <div class="field"><label>Start week</label><input class="mono-in qw-s" inputmode="numeric" value="${j.q.start}" data-j="${ji}" data-q="start"></div>
+            <div class="field"><label>Duration (wks)</label><input class="mono-in qw-s" inputmode="numeric" value="${j.q.dur}" data-j="${ji}" data-q="dur"></div>
+            <button class="gen" data-gen="${ji}">Generate schedule</button>
+          </div>
+          <p class="quick-note">Builds a typical deposit / progress / final draw schedule and spreads your costs across the job. You can fine-tune every line below afterward.</p>
+        </div>
+      </details>
+      <div class="ledgers">
+        <div class="ledger in"><h4><span class="dot"></span>Money in</h4>
+          <div class="wk-head"><span>What</span><span>Week</span><span>Amount</span><span></span></div>
+          ${j.in.map((l,li)=>lineHtml(ji,"in",li,l)).join("")}
+          <button class="addline" data-j="${ji}" data-add="in">+ Add payment</button></div>
+        <div class="ledger out"><h4><span class="dot"></span>Money out</h4>
+          <div class="wk-head"><span>What</span><span>Week</span><span>Amount</span><span></span></div>
+          ${j.out.map((l,li)=>lineHtml(ji,"out",li,l)).join("")}
+          <button class="addline" data-j="${ji}" data-add="out">+ Add cost</button></div>
+      </div>
+      <div class="job-actions"><button class="removejob" data-rem="${ji}">Remove this job</button></div>`;
+    box.appendChild(el);
+  });
+}
+function lineHtml(ji,side,li,l){
+  const w=Math.round(num(l.wk));
+  return `<div class="line">
+    <input class="desc" type="text" value="${esc(l.desc)}" data-j="${ji}" data-s="${side}" data-l="${li}" data-f="desc" placeholder="Label">
+    <div><input class="wk mono-in" inputmode="numeric" value="${l.wk}" data-j="${ji}" data-s="${side}" data-l="${li}" data-f="wk"><div class="wkdate">${fmtMD(weekDate(w))}</div></div>
+    <input class="amt mono-in" inputmode="numeric" value="${l.amt}" data-j="${ji}" data-s="${side}" data-l="${li}" data-f="amt" placeholder="0">
+    <button class="x" data-j="${ji}" data-s="${side}" data-delline="${li}" title="Remove">\u00d7</button>
+  </div>`;
+}
+function esc(s){return String(s==null?"":s).replace(/"/g,"&quot;").replace(/</g,"&lt;");}
+
+function renderResults(){
+  const r=compute();
+  const negC=r.crunches.find(c=>c.level==="bad");
+  const tight=r.crunches.length>0;
+  let pill,word,sub;
+  if(negC){pill='<span class="pill bad">ACTION NEEDED</span>';word="You run out of cash before a payment lands.";
+    sub=`Your balance dips below zero the week of ${fmtLong(weekDate(negC.w))} (week ${negC.w}). You'll be covering costs out of pocket \u2014 or stalling the job \u2014 unless a payment moves up or you line up credit.`;}
+  else if(tight){const c=r.crunches[0];pill='<span class="pill warn">RUNNING TIGHT</span>';word="You stay afloat, but it gets tight.";
+    sub=`Your balance dips below your ${fmt(r.buffer)} buffer in ${r.crunches.length} week${r.crunches.length>1?"s":""}, first the week of ${fmtLong(weekDate(c.w))}. Not dangerous yet, but no room for a surprise.`;}
+  else{pill='<span class="pill ok">HEALTHY</span>';word="You stay above your buffer the whole way.";
+    sub="Across this forecast, your cash never drops below the cushion you set. Good position to take on more work.";}
+  $("#verdict").innerHTML=`<p class="verdict">${pill}${word}</p><p class="verdict-sub">${sub}</p>`;
+
+  $("#stats").innerHTML=`
+    <div class="stat lowpt"><div class="k">Lowest point</div><div class="v">${fmt(r.low)}</div><div class="v"><small>week of ${fmtLong(weekDate(r.lowW))}</small></div></div>
+    <div class="stat"><div class="k">Tight / negative weeks</div><div class="v">${r.crunches.length}<small> of ${r.W+1}</small></div></div>
+    <div class="stat"><div class="k">Money in (total)</div><div class="v" style="color:var(--good)">${fmt(r.totalIn)}</div></div>
+    <div class="stat"><div class="k">Money out (total)</div><div class="v" style="color:var(--danger)">${fmt(r.totalOut)}</div></div>`;
+
+  drawChart(r);
+
+  const dl=$("#dangerList");
+  if(r.crunches.length===0){
+    dl.innerHTML=`<div class="all-clear">\u2713 No crunch weeks in this forecast. Your cash stays above ${fmt(r.buffer)} the whole way.</div>`;
+  }else{
+    dl.innerHTML=`<h3>Watch these weeks</h3>`+r.crunches.map(c=>
+      `<div class="crunch ${c.level}"><span class="lbl">Week of ${fmtLong(weekDate(c.w))} ${c.level==="bad"?"\u2014 out of cash":"\u2014 below buffer"}</span><span class="amt">${fmt(c.b)}</span></div>`).join("");
+  }
+}
+
+function drawChart(r){
+  const W=r.W,bal=r.bal,buf=r.buffer;
+  const padL=58,padR=14,padT=14,padB=30;
+  const innerW=Math.max(520-padL-padR,(W+1)*34);
+  const fullW=innerW+padL+padR,H=244,innerH=H-padT-padB;
+  let max=Math.max(buf,...bal,0),min=Math.min(0,...bal);
+  if(max===min){max+=1000;min-=1000;}
+  const padv=(max-min)*0.08;max+=padv;min-=padv;
+  const y=v=>padT+innerH-((v-min)/(max-min))*innerH;
+  const step=innerW/(W+1),bw=Math.min(26,step*0.62),x=w=>padL+step*w+step/2;
+  const zeroY=y(0),bufY=y(buf);
+  let bars="",labels="";
+  const labelEvery=W<=14?1:(W<=28?2:4);
+  for(let w=0;w<=W;w++){
+    const v=bal[w],yy=y(v),top=Math.min(yy,zeroY),h=Math.abs(yy-zeroY);
+    const col=v<0?"var(--danger)":(v<buf?"var(--tight)":"var(--good)");
+    bars+=`<rect x="${x(w)-bw/2}" y="${top}" width="${bw}" height="${Math.max(h,1)}" rx="2" fill="${col}"></rect>`;
+    if(w===r.lowW)bars+=`<circle cx="${x(w)}" cy="${y(r.low)}" r="3.5" fill="var(--blue)"></circle>`;
+    if(w%labelEvery===0)labels+=`<text x="${x(w)}" y="${H-7}" text-anchor="middle" font-size="9.5" fill="var(--steel-light)" font-family="IBM Plex Mono">${fmtMD(weekDate(w))}</text>`;
+  }
+  let grid="";const ticks=4;
+  for(let i=0;i<=ticks;i++){const val=min+(max-min)*i/ticks,gy=y(val);
+    grid+=`<line x1="${padL}" y1="${gy}" x2="${fullW-padR}" y2="${gy}" stroke="var(--line)"></line>`;
+    grid+=`<text x="${padL-8}" y="${gy+3}" text-anchor="end" font-size="9.5" fill="var(--steel-light)" font-family="IBM Plex Mono">${fmt(val)}</text>`;}
+  const bufLine=`<line x1="${padL}" y1="${bufY}" x2="${fullW-padR}" y2="${bufY}" stroke="var(--tight)" stroke-width="1.3" stroke-dasharray="5 4"></line><text x="${fullW-padR}" y="${bufY-5}" text-anchor="end" font-size="9.5" fill="var(--tight)" font-family="IBM Plex Mono">buffer</text>`;
+  const zeroLine=`<line x1="${padL}" y1="${zeroY}" x2="${fullW-padR}" y2="${zeroY}" stroke="var(--ink)" stroke-width="1.4"></line>`;
+  $("#chart").innerHTML=`<svg viewBox="0 0 ${fullW} ${H}" preserveAspectRatio="xMinYMin meet" role="img" aria-label="Weekly cash balance">${grid}${bufLine}${bars}${zeroLine}${labels}<text x="${padL}" y="11" font-size="10" fill="var(--steel-light)" font-family="IBM Plex Mono">Week-ending balance</text></svg>`;
+}
+
+let saveTimer;
+function touched(){renderResults();clearTimeout(saveTimer);saveTimer=setTimeout(save,400);}
+function touchedRedraw(){renderJobs();touched();}
+
+document.addEventListener("input",e=>{
+  const t=e.target;
+  if(t.id==="startDate"){state.startDate=t.value;return touchedRedraw();}
+  if(t.id==="startCash"){state.startCash=num(t.value);return touched();}
+  if(t.id==="overhead"){state.overhead=num(t.value);return touched();}
+  if(t.id==="buffer"){state.buffer=num(t.value);return touched();}
+  if(t.id==="weeks"){state.weeks=num(t.value);return touchedRedraw();}
+  const j=t.dataset.j;
+  if(j!==undefined){
+    const job=state.jobs[+j];
+    if(t.dataset.q!==undefined){job.q[t.dataset.q]=t.value;return;}
+    if(t.dataset.f==="name"){job.name=t.value;return touched();}
+    const side=t.dataset.s,li=+t.dataset.l,f=t.dataset.f;
+    if(side&&f){const line=job[side][li];line[f]=(f==="desc")?t.value:num(t.value);
+      if(f==="wk"){const dd=e.target.parentElement.querySelector(".wkdate");if(dd)dd.textContent=fmtMD(weekDate(Math.round(num(t.value))));}
+      const sum=t.closest(".job").querySelector(".jobsum");
+      if(sum&&(f==="amt")){const tin=job.in.reduce((s,l)=>s+num(l.amt),0),tout=job.out.reduce((s,l)=>s+num(l.amt),0),net=tin-tout,m=tin>0?Math.round(net/tin*100):0;
+        sum.innerHTML=`In <b>${fmt(tin)}</b> &middot; Out <b>${fmt(tout)}</b> &middot; Net <b class="${net<0?'neg':''}">${fmt(net)}</b>${tin>0?` &middot; ${m}% margin`:""}`;}
+      return touched();}
+  }
+});
+document.addEventListener("click",e=>{
+  const t=e.target;
+  if(t.dataset.gen!==undefined){quickGen(state.jobs[+t.dataset.gen]);return touchedRedraw();}
+  if(t.dataset.add){state.jobs[+t.dataset.j][t.dataset.add].push({id:uid(),desc:"",wk:0,amt:0});return touchedRedraw();}
+  if(t.dataset.delline!==undefined){state.jobs[+t.dataset.j][t.dataset.s].splice(+t.dataset.delline,1);return touchedRedraw();}
+  if(t.dataset.rem!==undefined){state.jobs.splice(+t.dataset.rem,1);if(state.jobs.length===0)state.jobs=[blankJob()];return touchedRedraw();}
+});
+document.addEventListener("toggle",e=>{if(e.target.dataset&&e.target.dataset.jq!==undefined){const j=state.jobs[+e.target.dataset.jq];if(j)j._qopen=e.target.open;}},true);
+
+$("#addJob").onclick=()=>{state.jobs.push(blankJob());touchedRedraw();};
+$("#loadExample").onclick=()=>{state=exampleState();syncGlobals();touchedRedraw();};
+$("#clearAll").onclick=()=>{state=emptyState();syncGlobals();touchedRedraw();};
+$("#printBtn").onclick=()=>{$("#printDate").textContent="Starting "+fmtLong(weekDate(0))+" \u00b7 generated "+fmtLong(new Date());window.print();};
+$("#emailBtn").onclick=()=>{
+  const v=$("#email").value.trim(),note=$("#captureNote");
+  if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(v)){note.textContent="Enter a valid email and we'll send your forecast over.";return;}
+  // DEMO STUB: wire to Mailchimp / Zapier to capture the lead + email the PDF.
+  note.textContent="\u2713 Thanks \u2014 your forecast is on its way to "+v+". (Demo: connect this to Mailchimp/Zapier to go live.)";
+  $("#email").value="";
+};
+function syncGlobals(){$("#startDate").value=state.startDate;$("#startCash").value=state.startCash;$("#overhead").value=state.overhead;$("#buffer").value=state.buffer;$("#weeks").value=state.weeks;}
+
+(async function(){
+  const saved=await load();
+  state=saved||exampleState();
+  if(!state.startDate)state.startDate=nextMonday();
+  syncGlobals();renderJobs();renderResults();
+})();
+  </script>
+</ToolLayout>

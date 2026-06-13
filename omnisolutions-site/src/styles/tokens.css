@@ -1,0 +1,22 @@
+:root {
+  /* Brand */
+  --os-blue: #1F4E79;
+  --os-blue-dark: #163A5C;
+  --os-blue-tint: #E8EFF6;
+  --os-ink: #18222B;
+  --os-steel: #5B6B79;
+  --os-steel-light: #8795A0;
+  --os-line: #D9DFE5;
+  --os-paper: #F4F6F8;
+  --os-card: #FFFFFF;
+  --os-good: #2E7D58;
+  --os-amber: #E0962D;
+
+  /* Type */
+  --os-display: "Archivo", system-ui, sans-serif;
+  --os-body: "IBM Plex Sans", system-ui, sans-serif;
+  --os-mono: "IBM Plex Mono", ui-monospace, monospace;
+
+  --os-shadow: 0 1px 2px rgba(24,34,43,.06), 0 10px 30px rgba(24,34,43,.07);
+  --os-radius: 14px;
+}

@@ -1,0 +1,30 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import ToolCard from '../../components/ToolCard.astro';
+import { withBase } from '../../lib/url';
+import { tools } from '../../data/tools';
+---
+<BaseLayout
+  title="For contractors — OmniSolutions"
+  description="Free tools and systems help for contractors and owner-led construction businesses."
+>
+  <section class="os-wrap hero">
+    <p class="os-eyebrow">For contractors</p>
+    <h1 class="os-h1">The job site runs fine. It's the back office that's killing you.</h1>
+    <p class="os-lead">Late draws, change orders that never get billed, cash that's tight even on profitable work. These aren't money problems — they're system problems. Start with a free tool below.</p>
+    <a class="os-btn" href={withBase('/contractor/tools')}>See all tools</a>
+  </section>
+
+  <section class="os-wrap tools">
+    <h2 class="os-h2">Free tools for contractors</h2>
+    <div class="tool-grid">
+      {tools.map((tool) => <ToolCard tool={tool} />)}
+    </div>
+  </section>
+
+  <style>
+    .hero { padding: 64px 22px 32px; }
+    .tools { padding: 24px 22px 12px; }
+    .tool-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; margin-top: 8px; }
+  </style>
+</BaseLayout>

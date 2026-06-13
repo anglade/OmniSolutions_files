@@ -1,0 +1,25 @@
+---
+import { withBase } from '../lib/url';
+---
+<header class="site-head">
+  <div class="os-wrap site-head-inner">
+    <a class="site-logo" href={withBase('/')}>
+      <span class="mark"></span> OmniSolutions
+    </a>
+    <nav class="site-nav">
+      <a href={withBase('/contractor/tools')}>Free tools</a>
+      <a href={withBase('/contractor')}>For contractors</a>
+    </nav>
+  </div>
+
+  <style>
+    .site-head { border-bottom: 1px solid var(--os-line); background: rgba(255,255,255,.85); backdrop-filter: blur(6px); position: sticky; top: 0; z-index: 10; }
+    .site-head-inner { display: flex; align-items: center; justify-content: space-between; padding-top: 16px; padding-bottom: 16px; }
+    .site-logo { display: inline-flex; align-items: center; gap: 9px; font-family: var(--os-display); font-weight: 800; font-size: 19px; color: var(--os-ink); text-decoration: none; letter-spacing: -.01em; }
+    .site-logo .mark { width: 18px; height: 18px; border-radius: 50%; border: 3px solid var(--os-blue); display: inline-block; }
+    .site-nav { display: flex; gap: 22px; }
+    .site-nav a { font-family: var(--os-body); font-weight: 500; font-size: 15px; color: var(--os-steel); text-decoration: none; }
+    .site-nav a:hover { color: var(--os-blue); }
+    @media (max-width: 520px) { .site-nav { gap: 14px; font-size: 14px; } .site-logo { font-size: 17px; } }
+  </style>
+</header>

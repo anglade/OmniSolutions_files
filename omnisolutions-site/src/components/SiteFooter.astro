@@ -1,0 +1,28 @@
+---
+import { withBase } from '../lib/url';
+const year = new Date().getFullYear();
+---
+<footer class="site-foot">
+  <div class="os-wrap site-foot-inner">
+    <div>
+      <div class="foot-logo">OmniSolutions</div>
+      <p class="foot-tag">Business systems for owner-led companies.</p>
+    </div>
+    <nav class="foot-nav">
+      <a href={withBase('/contractor/tools')}>Free tools</a>
+      <a href={withBase('/contractor')}>For contractors</a>
+    </nav>
+  </div>
+  <div class="os-wrap foot-base">© {year} OmniSolutions</div>
+
+  <style>
+    .site-foot { border-top: 1px solid var(--os-line); background: #fff; margin-top: 64px; padding: 44px 0 28px; }
+    .site-foot-inner { display: flex; justify-content: space-between; gap: 24px; flex-wrap: wrap; }
+    .foot-logo { font-family: var(--os-display); font-weight: 800; font-size: 18px; }
+    .foot-tag { color: var(--os-steel); margin: 4px 0 0; font-size: 14px; }
+    .foot-nav { display: flex; gap: 22px; flex-wrap: wrap; }
+    .foot-nav a { color: var(--os-steel); text-decoration: none; font-size: 14px; }
+    .foot-nav a:hover { color: var(--os-blue); }
+    .foot-base { color: var(--os-steel-light); font-size: 12px; margin-top: 28px; }
+  </style>
+</footer>
