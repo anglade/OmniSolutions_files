@@ -467,7 +467,7 @@ $("#emailBtn").onclick=()=>{
   const v=$("#email").value.trim(),note=$("#captureNote");
   if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(v)){note.textContent="Enter a valid email and we'll send your forecast over.";return;}
   // Send to Zapier webhook
-  fetch('https://hooks.zapier.com/hooks/catch/27934007/43rr13e/', {
+  fetch('https://hooks.zapier.com/hooks/catch/4902970/43ri0jy/', {
     method: 'POST',
     headers: {'Content-Type': 'application/json'},
     body: JSON.stringify({email: v})
